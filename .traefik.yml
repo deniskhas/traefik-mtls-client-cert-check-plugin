@@ -1,0 +1,10 @@
+displayName: mTLS Client Certificate Check Plugin
+type: middleware
+import: github.com/deniskhas/traefik-mtls-client-cert-check-plugin
+
+summary: 'Check Client Certificate validity in mTLS'
+
+testData:
+  secretName: ""
+  secretNamespace: ""
+  secretKey: ""
