@@ -1,4 +1,4 @@
-package main
+package mtlscls
 
 import (
 	"context"
@@ -23,10 +23,13 @@ func CreateConfig() *Config {
 }
 
 type MTLSCLSValidator struct {
+	next   http.Handler
+	name   string
 	caPool *x509.CertPool
 }
 
-func New(ctx context.Context, config *Config, _ string) (http.Handler, error) {
+func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
+
 	// Create in-cluster Kubernetes client
 	kubeConfig, err := rest.InClusterConfig()
 	if err != nil {
@@ -54,15 +57,18 @@ func New(ctx context.Context, config *Config, _ string) (http.Handler, error) {
 	}
 
 	return &MTLSCLSValidator{
+		next:   next,
+		name:   name,
 		caPool: pool,
 	}, nil
 }
 
-func (t *MTLSCLSValidator) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+// ServeHTTP implements http.Handler
+func (m *MTLSCLSValidator) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	if req.TLS != nil && len(req.TLS.PeerCertificates) > 0 {
 		cert := req.TLS.PeerCertificates[0]
 		opts := x509.VerifyOptions{
-			Roots: t.caPool,
+			Roots: m.caPool,
 		}
 
 		// Separate check for expired certificate
@@ -80,5 +86,5 @@ func (t *MTLSCLSValidator) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 	}
 	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte("Certificate validated successfully"))
+	m.next.ServeHTTP(rw, req)
 }
-
