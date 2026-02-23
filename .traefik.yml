@@ -1,9 +1,7 @@
-displayName: mTLS Client Certificate Check Plugin
+displayName: "mTLS Client Cert Check"
 type: middleware
 import: github.com/deniskhas/traefik-mtls-client-cert-check-plugin
-
-summary: 'Check Client Certificate validity in mTLS'
-
+summary: "Validates mTLS client certificates using CA from Kubernetes secret"
 testData:
   secretName: ""
   secretNamespace: ""
