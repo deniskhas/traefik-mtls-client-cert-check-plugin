@@ -84,7 +84,5 @@ func (m *MTLSCLSValidator) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 			return
 		}
 	}
-	rw.WriteHeader(http.StatusOK)
-	rw.Write([]byte("Certificate validated successfully"))
 	m.next.ServeHTTP(rw, req)
 }
